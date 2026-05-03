@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For You ❤️</title>
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+    font-family: Arial;
+    color: white;
+    text-align: center;
+}
+
+#ui {
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    z-index: 10;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: pink;
+}
+
+input {
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 6px;
+    border: none;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="ui">
+    <h2 id="question">Do you remember me?</h2>
+    <div id="buttons">
+        <button id="yesBtn">Yes</button>
+        <button id="noBtn">No</button>
+    </div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let state = "question";
+let userName = "";
+let messages = [];
+let time = 0;
+
+// PARTICLES
+let particles = Array.from({length:120}, () => ({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    size: Math.random()*2,
+    speed: Math.random()*1
+}));
+
+// HEARTS
+let hearts = Array.from({length:30}, () => ({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    size: Math.random()*20+10,
+    speed: Math.random()*1+0.5
+}));
+
+// BUTTONS
+document.getElementById("yesBtn").onclick = () => showNameInput();
+
+document.getElementById("noBtn").onclick = () => {
+    document.getElementById("question").innerText =
+        "This is your register number - 25107110";
+    document.getElementById("buttons").innerHTML =
+        "<button onclick='showNameInput()'>Continue</button>";
+};
+
+// NAME INPUT
+function showNameInput(){
+    document.getElementById("ui").innerHTML = `
+        <h2>Enter your name</h2>
+        <input id="nameInput"><br><br>
+        <button onclick="startAnimation()">Start</button>
+    `;
+}
+
+// START ANIMATION
+function startAnimation(){
+    userName = document.getElementById("nameInput").value || "You";
+
+    messages = [
+    "Hey 💫",
+    "Happy Birthday my dear nothing 🎂💖",
+    "Unakku innikki romba nalla day a irukanum nu sincerely wish panren 🌸",
+
+    "Namma rendu perum share pannina memories la irundhu 🤍",
+    "naan neraya kathukitten ✨",
+
+    "Life la sila relationships long last aagathu 💭",
+    "aana avlo naal irundhadhu kooda oru meaning irukkum nu ippo puriyuthu 🌙",
+
+    "Un life la nee happy-a irukanum 😊",
+    "peaceful-a irukanum nu dhaan enoda wish 💗",
+
+    "Nee enna pathi eppadi ninaikra nu theriyadhu 🤍",
+    "aana naan unna nallaa dhaan ninaikaren 💞",
+
+    "Take care of yourself 🌷",
+    "Always wishing you the best 💫"
+    ];
+
+    document.getElementById("ui").style.display = "none";
+    state = "animation";
+}
+
+// DRAW HEART
+function drawHeart(x,y,size){
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.bezierCurveTo(x-size,y-size,x-size*2,y+size/2,x,y+size);
+    ctx.bezierCurveTo(x+size*2,y+size/2,x+size,y-size,x,y);
+    ctx.fillStyle = "rgba(255,105,180,0.9)";
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "hotpink";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+}
+
+// ANIMATION LOOP
+function animate(){
+
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // PARTICLES
+    particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fillStyle="white";
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = "white";
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        p.y -= p.speed;
+        if(p.y<0) p.y = canvas.height;
+    });
+
+    // HEARTS
+    hearts.forEach(h=>{
+        drawHeart(h.x,h.y,h.size);
+        h.y -= h.speed;
+        if(h.y<0){
+            h.y = canvas.height;
+            h.x = Math.random()*canvas.width;
+        }
+    });
+
+    // TEXT ANIMATION
+    if(state === "animation"){
+        time += 0.02;
+
+        let index = Math.floor(time / 5);
+        let progress = (time % 5) / 5;
+
+        ctx.textAlign = "center";
+        ctx.font = "30px Arial";
+
+        if(index < messages.length){
+
+            let y = canvas.height/2 + (1 - progress) * 60;
+
+            ctx.fillStyle = "pink";
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = "hotpink";
+
+            ctx.fillText(messages[index], canvas.width/2, y);
+
+            ctx.shadowBlur = 0;
+
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
+
